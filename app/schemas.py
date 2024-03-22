@@ -10,7 +10,7 @@ class PostFactsRequest(BaseModel):
 
 
 class PostFactsResponse(PostFactsRequest):
-    id: uuid.UUID
+    fact_id: uuid.UUID
     created_at: datetime
 
 

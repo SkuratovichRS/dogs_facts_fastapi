@@ -29,6 +29,13 @@ class DogsFactsApi:
             json.dump(data, file, indent=4)
 
     def get_facts(self, page: int, page_size: int, sorting: Any):
+        def sort_(data_):
+            if sorting[0] == '-':
+                data_.sort(key=lambda x: x[sorting[1:]], reverse=True)
+            else:
+                data_.sort(key=lambda x: x[sorting])
+            return data_
+
         with open(self.data, 'r') as file:
             data = json.load(file)
         if page_size == 0:
@@ -45,7 +52,7 @@ class DogsFactsApi:
             i += 1
         chosen_facts.append(pagination)
         resp = chosen_facts[page]
-        return resp
+        return sort_(resp)
 
 
 dogs_facts_api = DogsFactsApi()
