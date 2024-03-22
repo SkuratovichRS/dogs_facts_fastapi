@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 from fastapi import FastAPI
 from app.db import dogs_facts_api
 from app import schemas
@@ -9,7 +10,7 @@ app = FastAPI()
 
 @app.post(
     "/api/v1/facts/",
-    response_model=schemas.FactsResponse,
+    response_model=schemas.PostFactsResponse,
     status_code=201,
 )
 def post_fact(fact: schemas.PostFactsRequest):
@@ -21,7 +22,7 @@ def post_fact(fact: schemas.PostFactsRequest):
             'likes': fact.likes,
             'created_at': created_at}
     dogs_facts_api.add_fact(fact)
-    return schemas.FactsResponse(
+    return schemas.PostFactsResponse(
         id=fact["fact_id"],
         fact_text=fact["fact_text"],
         interest=fact["interest"],
@@ -30,6 +31,9 @@ def post_fact(fact: schemas.PostFactsRequest):
     )
 
 
-@app.get("/api/v1/facts", status_code=200)
-def get_facts():
-    return dogs_facts_api.get_facts()
+@app.get("/api/v1/facts/{page}/{page_size}/{sorting}",
+         response_model=schemas.GetFactsResponse,
+         status_code=200)
+def get_facts(page: int = 0, page_size: int = 5, sorting: Any = 'likes'):
+    return schemas.GetFactsResponse(total=dogs_facts_api.total(),
+                                    data=dogs_facts_api.get_facts(page, page_size, sorting))

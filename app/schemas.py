@@ -1,5 +1,5 @@
 import uuid
-
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -9,5 +9,12 @@ class PostFactsRequest(BaseModel):
     likes: int = 0
 
 
-class FactsResponse(PostFactsRequest):
+class PostFactsResponse(PostFactsRequest):
     id: uuid.UUID
+    created_at: datetime
+
+
+class GetFactsResponse(BaseModel):
+    total: int
+    data: list[dict]
+
