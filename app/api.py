@@ -1,5 +1,5 @@
 import uuid
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app.db import dogs_facts_api
 from app import schemas
 from datetime import datetime
@@ -9,7 +9,7 @@ app = FastAPI()
 
 @app.post(
     "/api/v1/facts/",
-    response_model=schemas.PostFactsResponse,
+    response_model=schemas.FactsResponse,
     status_code=201,
 )
 def post_fact(fact: schemas.PostFactsRequest):
@@ -21,7 +21,7 @@ def post_fact(fact: schemas.PostFactsRequest):
             'likes': fact.likes,
             'created_at': created_at}
     dogs_facts_api.add_fact(fact)
-    return schemas.PostFactsResponse(
+    return schemas.FactsResponse(
         fact_id=fact["fact_id"],
         fact_text=fact["fact_text"],
         interest=fact["interest"],
@@ -36,3 +36,11 @@ def post_fact(fact: schemas.PostFactsRequest):
 def get_facts(page: int = 0, page_size: int = 5, sorting: str = 'likes'):
     return schemas.GetFactsResponse(total=dogs_facts_api.total(),
                                     data=dogs_facts_api.get_facts(page, page_size, sorting))
+
+
+@app.get("/api/v1/facts/<id>/{fact_id}",
+         response_model=schemas.FactsResponse, status_code=200)
+def get_fact_by_id(fact_id: str):
+    if not dogs_facts_api.get_fact_by_id(fact_id):
+        raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
+    return dogs_facts_api.get_fact_by_id(fact_id)

@@ -9,7 +9,7 @@ class PostFactsRequest(BaseModel):
     likes: int = 0
 
 
-class PostFactsResponse(PostFactsRequest):
+class FactsResponse(PostFactsRequest):
     fact_id: uuid.UUID
     created_at: datetime
 

@@ -12,7 +12,7 @@ class DogsFactsApi:
         with open(self.data, 'w') as file:
             json.dump(data, file)
 
-    def total(self):
+    def total(self) -> int:
         if not os.path.exists(self.data):
             self.create_database()
         with open(self.data, 'r') as file:
@@ -28,7 +28,7 @@ class DogsFactsApi:
         with open(self.data, 'w') as file:
             json.dump(data, file, indent=4)
 
-    def get_facts(self, page: int, page_size: int, sorting: Any):
+    def get_facts(self, page: int, page_size: int, sorting: Any) -> list[dict]:
         def sort_(data_):
             if sorting[0] == '-':
                 data_.sort(key=lambda x: x[sorting[1:]], reverse=True)
@@ -54,6 +54,14 @@ class DogsFactsApi:
         resp = chosen_facts[page]
         return sort_(resp)
 
+    def get_fact_by_id(self, fact_id: str) -> dict | bool:
+        with open(self.data, 'r') as file:
+            data = json.load(file)
+        for fact in data['data']:
+            if fact_id == fact['fact_id']:
+                return fact
+        return False
+
 
 dogs_facts_api = DogsFactsApi()
-
+print(dogs_facts_api.get_fact_by_id("829769cd-189b-4748-ba51-b55f37025dc6"))
