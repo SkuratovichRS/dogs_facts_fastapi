@@ -30,7 +30,7 @@ def post_fact(fact: schemas.PostFactsRequest):
     )
 
 
-@app.get("/api/v1/facts/{page}/{page_size}/{sorting}",
+@app.get("/api/v1/facts/",
          response_model=schemas.GetFactsResponse,
          status_code=200)
 def get_facts(page: int = 0, page_size: int = 5, sorting: str = 'likes'):
@@ -44,3 +44,16 @@ def get_fact_by_id(fact_id: str):
     if not dogs_facts_api.get_fact_by_id(fact_id):
         raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
     return dogs_facts_api.get_fact_by_id(fact_id)
+
+
+@app.delete('/api/v1/facts/<id>/{fact_id}',
+            status_code=204)
+def delete_fact_by_id(fact_id: str):
+    dogs_facts_api.delete_fact_by_id(fact_id)
+
+
+@app.put('PUT /api/v1/facts/<id>/{fact_id})',
+         response_model=schemas.FactsResponse, status_code=201)
+def change_fact_by_id(fact_id: str, fact_text: str = None,
+                      interest: int = None, likes: int = None):
+    pass

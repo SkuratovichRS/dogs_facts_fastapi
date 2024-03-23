@@ -62,6 +62,18 @@ class DogsFactsApi:
                 return fact
         return False
 
+    def delete_fact_by_id(self, fact_id: str) -> None:
+        with open(self.data, 'r') as file:
+            data = json.load(file)
+        for i, fact in enumerate(data['data']):
+            if fact_id == fact['fact_id']:
+                data['data'].pop(i)
+        with open(self.data, 'w') as file:
+            json.dump(data, file, indent=4)
+
+    def change_fact_by_id(self, fact_id):
+        pass
+
 
 dogs_facts_api = DogsFactsApi()
-print(dogs_facts_api.get_fact_by_id("829769cd-189b-4748-ba51-b55f37025dc6"))
+dogs_facts_api.change_fact_by_id("26ea3509-9466-42ab-a5d8-af18176ef470")
