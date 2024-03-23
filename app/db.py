@@ -71,8 +71,23 @@ class DogsFactsApi:
         with open(self.data, 'w') as file:
             json.dump(data, file, indent=4)
 
-    def change_fact_by_id(self, fact_id):
-        pass
+    def change_fact_by_id(self, fact_id: str, fact_text: str = None,
+                          interest: int = None, likes: int = None) -> dict | bool:
+        with open(self.data, 'r') as file:
+            data = json.load(file)
+        for i, fact in enumerate(data['data']):
+            if fact_id == fact['fact_id']:
+                if fact_text:
+                    data['data'][i]['fact_text'] = fact_text
+                if interest:
+                    data['data'][i]['interest'] = interest
+                if likes:
+                    data['data'][i]['likes'] = likes
+                resp = data['data'][i]
+                with open(self.data, 'w') as file:
+                    json.dump(data, file, indent=4)
+                return resp
+        return False
 
 
 dogs_facts_api = DogsFactsApi()

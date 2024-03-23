@@ -52,8 +52,10 @@ def delete_fact_by_id(fact_id: str):
     dogs_facts_api.delete_fact_by_id(fact_id)
 
 
-@app.put('PUT /api/v1/facts/<id>)',
+@app.put('/api/v1/facts/<id>',
          response_model=schemas.FactsResponse, status_code=201)
 def change_fact_by_id(fact_id: str, fact_text: str = None,
                       interest: int = None, likes: int = None):
-    pass
+    if not dogs_facts_api.change_fact_by_id(fact_id):
+        raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
+    return dogs_facts_api.change_fact_by_id(fact_id, fact_text, interest, likes)
