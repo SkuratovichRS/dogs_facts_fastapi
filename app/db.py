@@ -1,6 +1,9 @@
 import json
 import os
+import requests
+from random import randint
 from typing import Any
+from datetime import datetime
 
 
 class DogsFactsApi:
@@ -89,6 +92,33 @@ class DogsFactsApi:
                 return resp
         return False
 
+    def add_like_by_id(self, fact_id: str) -> dict | bool:
+        with open(self.data, 'r') as file:
+            data = json.load(file)
+        for i, fact in enumerate(data['data']):
+            if fact_id == fact['fact_id']:
+                data['data'][i]['likes'] += 1
+                resp = data['data'][i]
+                with open(self.data, 'w') as file:
+                    json.dump(data, file, indent=4)
+                return resp
+        return False
+
+    def import_facts_from_dogapi(self, amount: int) -> None:
+        url = 'https://dogapi.dog/api/v2/facts'
+        params = {'limit': amount}
+        dogs_api_resp = requests.get(url, params=params).json()
+        with open(self.data, 'r') as file:
+            data = json.load(file)
+        for fact in dogs_api_resp['data']:
+            imported_fact = {"fact_id": fact['id'],
+                             "fact_text": fact['attributes']['body'],
+                             "interest": randint(1, 10),
+                             "likes": 0,
+                             "created_at": str(datetime.now())}
+            data['data'].append(imported_fact)
+        with open(self.data, 'w') as file:
+            json.dump(data, file, indent=4)
+
 
 dogs_facts_api = DogsFactsApi()
-

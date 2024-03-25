@@ -18,3 +18,6 @@ class GetFactsResponse(BaseModel):
     total: int
     data: list[dict]
 
+
+class ImportFactsResponse(BaseModel):
+    amount: int

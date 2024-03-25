@@ -59,3 +59,18 @@ def change_fact_by_id(fact_id: str, fact_text: str = None,
     if not dogs_facts_api.change_fact_by_id(fact_id):
         raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
     return dogs_facts_api.change_fact_by_id(fact_id, fact_text, interest, likes)
+
+
+@app.post('/api/v1/facts/<id>/like',
+          response_model=schemas.FactsResponse, status_code=201)
+def add_like_by_id(fact_id: str):
+    if not dogs_facts_api.add_like_by_id(fact_id):
+        raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
+    return dogs_facts_api.add_like_by_id(fact_id)
+
+
+@app.post('/api/v1/facts/import',
+          response_model=schemas.ImportFactsResponse, status_code=201)
+def import_facts_from_dogapi(amount: int):
+    dogs_facts_api.import_facts_from_dogapi(amount)
+    return schemas.ImportFactsResponse(amount=amount)
