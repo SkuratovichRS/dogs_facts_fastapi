@@ -16,8 +16,9 @@ class FactsResponse(PostFactsRequest):
 
 class GetFactsResponse(BaseModel):
     total: int
-    data: list[dict]
+    data: list[FactsResponse]
 
 
 class ImportFactsResponse(BaseModel):
     amount: int
+
