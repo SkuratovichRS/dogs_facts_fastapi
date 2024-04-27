@@ -1,12 +1,31 @@
 import uuid
-from fastapi import FastAPI, HTTPException, Request, Header
+from fastapi import FastAPI, Request, Header
 from app.db import dogs_facts_api, NotFoundException
 from app import schemas
 from datetime import datetime
+from fastapi.responses import JSONResponse
 import time
 from app.auth import auth_token
 
 app = FastAPI()
+
+
+@app.exception_handler(NotFoundException)
+async def unicorn_exception_handler(request: Request, exc: NotFoundException):
+    return JSONResponse(
+        status_code=404,
+        content={"detail": exc.detail},
+    )
+
+
+@app.middleware("http")
+async def authorization(request: Request, call_next):
+    token = request.headers.get("auth")
+    if 'api/v1' in str(request.url):
+        if token != auth_token:
+            return JSONResponse({'error': 'not authenticated'}, status_code=401)
+    response = await call_next(request)
+    return response
 
 
 @app.middleware("http")
@@ -19,16 +38,6 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     print(f"Запрос выполнен, {process_time}")
-    return response
-
-
-@app.middleware("http")
-async def authorization(request: Request, call_next):
-    token = request.headers.get("auth")
-    if 'api/v1' in str(request.url):
-        if token != auth_token:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-    response = await call_next(request)
     return response
 
 
@@ -68,10 +77,7 @@ def get_facts(page: int = 0, page_size: int = 5,
 @app.get("/api/v1/facts/{fact_id}",
          response_model=schemas.FactsResponse, status_code=200)
 def get_fact_by_id(fact_id: str, auth: str = Header()):
-    try:
-        return dogs_facts_api.get_fact_by_id(fact_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
+    return dogs_facts_api.get_fact_by_id(fact_id)
 
 
 @app.delete('/api/v1/facts/{fact_id}',
@@ -85,19 +91,13 @@ def delete_fact_by_id(fact_id: str, auth: str = Header()):
 def change_fact_by_id(fact_id: str, fact_text: str = None,
                       interest: int = None, likes: int = None,
                       auth: str = Header()):
-    try:
-        return dogs_facts_api.change_fact_by_id(fact_id, fact_text, interest, likes)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
+    return dogs_facts_api.change_fact_by_id(fact_id, fact_text, interest, likes)
 
 
 @app.post('/api/v1/facts/{fact_id}/like',
           response_model=schemas.FactsResponse, status_code=201)
 def add_like_by_id(fact_id: str, auth: str = Header()):
-    try:
-        return dogs_facts_api.add_like_by_id(fact_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail=f"Fact {fact_id} is not found")
+    return dogs_facts_api.add_like_by_id(fact_id)
 
 
 @app.post('/api/v1/facts/import',

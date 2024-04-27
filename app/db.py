@@ -7,7 +7,8 @@ from datetime import datetime
 
 
 class NotFoundException(Exception):
-    ...
+    def __init__(self, detail):
+        self.detail = detail
 
 
 class DogsFactsApi:
@@ -49,7 +50,7 @@ class DogsFactsApi:
         for fact in data['data']:
             if fact_id == fact['fact_id']:
                 return fact
-        raise NotFoundException()
+        raise NotFoundException(f"Fact {fact_id} is not found")
 
     def delete_fact_by_id(self, fact_id: str) -> None:
         with open(self.data, 'r') as file:
@@ -82,7 +83,7 @@ class DogsFactsApi:
                 with open(self.data, 'w') as file:
                     json.dump(data, file, indent=4)
                 return resp
-        raise NotFoundException()
+        raise NotFoundException(f"Fact {fact_id} is not found")
 
     def add_like_by_id(self, fact_id: str) -> dict:
         with open(self.data, 'r') as file:
@@ -93,7 +94,7 @@ class DogsFactsApi:
                 with open(self.data, 'w') as file:
                     json.dump(data, file, indent=4)
                 return fact
-        raise NotFoundException()
+        raise NotFoundException(f"Fact {fact_id} is not found")
 
     def import_facts_from_dogapi(self, amount: int) -> None:
         url = 'https://dogapi.dog/api/v2/facts'
