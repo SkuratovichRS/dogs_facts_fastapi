@@ -32,12 +32,12 @@ async def authorization(request: Request, call_next):
 async def add_process_time_header(request: Request, call_next):
     if 'api/v1' not in str(request.url):
         return await call_next(request)
-    print("Запрос пришёл")
+    print("Request came")
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
-    print(f"Запрос выполнен, {process_time}")
+    print(f"Request executed, {process_time}")
     return response
 
 
